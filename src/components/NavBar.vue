@@ -7,9 +7,10 @@
         permanent
       >
         <v-list color="transparent">
-          <v-list-item prepend-icon="mdi-view-dashboard" title="Dashboard" @click="Page(0)"></v-list-item>
-          <v-list-item prepend-icon="mdi-account-box" title="Account" @click="Page(1)"></v-list-item>
-          <v-list-item prepend-icon="mdi-gavel" title="Admin" @click="Page(2)"></v-list-item>
+          <v-list-item prepend-icon="mdi-home" title="Homepage" @click="Page(0)"></v-list-item>
+          <v-list-item prepend-icon="mdi-view-dashboard" title="Dashboard" @click="Page(1)"></v-list-item>
+          <v-list-item prepend-icon="mdi-view-carousel" title="Workspace" @click="Page(2)"></v-list-item>
+          <v-list-item prepend-icon="mdi-code-tags" title="Project" @click="Page(3)"></v-list-item>
         </v-list>
 
         <template v-slot:append>
