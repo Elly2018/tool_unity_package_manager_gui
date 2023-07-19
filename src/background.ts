@@ -37,6 +37,7 @@ async function createWindow() {
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
   }
+  win.setMenu(null);
 }
 
 // Quit when all windows are closed.
@@ -63,7 +64,7 @@ app.on('ready', async () => {
     try {
       await installExtension(VUEJS3_DEVTOOLS)
     } catch (e) {
-      console.error('Vue Devtools failed to install:', e.toString())
+      console.error('Vue Devtools failed to install')
     }
   }
   createWindow()

@@ -1,26 +1,26 @@
 <template>
   <v-app>
-    <v-main>
-      <HelloWorld/>
-    </v-main>
+      <NavBar @page="(i) => page = i">
+        <Homepage v-if="page == 0"/>
+      </NavBar>
   </v-app>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import HelloWorld from './components/HelloWorld.vue'
+import NavBar from './components/NavBar.vue'
+import Homepage from './components/Homepage.vue'
 
 export default defineComponent({
   name: 'App',
-
   components: {
-    HelloWorld,
+    NavBar,
+    Homepage,
   },
-
-  data () {
+  data(){
     return {
-      //
+      page: 0
     }
-  },
+  }
 })
 </script>
