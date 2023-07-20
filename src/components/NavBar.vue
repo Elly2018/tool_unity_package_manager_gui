@@ -11,6 +11,8 @@
           <v-list-item prepend-icon="mdi-view-dashboard" title="Dashboard" @click="Page(1)"></v-list-item>
           <v-list-item prepend-icon="mdi-view-carousel" title="Workspace" @click="Page(2)"></v-list-item>
           <v-list-item prepend-icon="mdi-code-tags" title="Project" @click="Page(3)"></v-list-item>
+          <v-list-item prepend-icon="mdi-note" title="Preset" @click="Page(4)"></v-list-item>
+          <v-list-item prepend-icon="mdi-cog" title="Setting" @click="Page(5)"></v-list-item>
         </v-list>
 
         <template v-slot:append>

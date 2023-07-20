@@ -3,6 +3,8 @@
 import { app, protocol, BrowserWindow } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
+import * as loader from './backend/loader'
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Scheme must be registered before the app is ready
@@ -38,6 +40,7 @@ async function createWindow() {
     win.loadURL('app://./index.html')
   }
   win.setMenu(null);
+  loader.EventInit();
 }
 
 // Quit when all windows are closed.
