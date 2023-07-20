@@ -4,6 +4,8 @@ import { app, protocol, BrowserWindow } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import * as loader from './backend/loader'
+import * as io from './backend/io'
+import * as git from './backend/git'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -30,6 +32,11 @@ async function createWindow() {
     }
   })
 
+  win.setMenu(null);
+  loader.EventInit();
+  io.EventInit(win);
+  git.EventInit();
+
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string)
@@ -39,8 +46,6 @@ async function createWindow() {
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
   }
-  win.setMenu(null);
-  loader.EventInit();
 }
 
 // Quit when all windows are closed.

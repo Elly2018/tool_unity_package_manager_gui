@@ -39,10 +39,24 @@ export interface project_module {
     target_path: string
 }
 
+export interface project_resource {
+    from: string
+    to: string
+}
+
 export interface project_config {
     modules: Array<project_module>
+    resource: Array<project_resource>
 }
 
 export interface setting_file {
     config_filename: string
+    lastopen: string
+}
+
+export interface Snackbar_Content{
+    title: string
+    text: string
+    color: string
+    has_close: boolean
 }
