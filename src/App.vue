@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app id="app">
       <NavBar @page="(i) => page = i"  :page="page">
         <Homepage v-show="page == 0"/>
         <Dashboard v-show="page == 1"/>

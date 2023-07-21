@@ -4,7 +4,7 @@
         <v-card-title>專案管理</v-card-title>
         <v-card-subtitle>管理子模組, Git 同步設定</v-card-subtitle>
         <v-card-text>
-          {{ project_path }}
+          專案路徑: {{ project_path }}
         </v-card-text>
       </v-card>
       <v-card flat class="w-100 d-flex pa-3">
@@ -13,24 +13,54 @@
       <v-row class="pa-1 ma-1" style="height: 25vh;">
         <v-col cols="6">
           <v-list style="height: 25vh;">
-            <v-list-item v-for="(ms, i) in modules" :key="i" :title="ms.target_path" :subtitle="ms.url + '\n' + ms.branch">
+            <v-list-item class="text-truncate" v-for="(ms, i) in modules" :key="i">
+              <v-list-item-title style="cursor: pointer" @click="open(project_path + '\\' + ms.target_path)">本地: {{ ms.target_path }}</v-list-item-title>
+              <v-list-item-subtitle style="cursor: pointer" @click="open(ms.url)">來源: {{ ms.url + '\n' + ms.branch }}</v-list-item-subtitle>
               <template v-slot:append>
-                <v-btn color="info" icon="mdi-sync" variant="text" @click="sync_module(i)"></v-btn>
-                <v-btn color="info" icon="mdi-pen" variant="text" @click="edit_module_confirm(i)"></v-btn>
-                <v-btn color="error" icon="mdi-delete" variant="text" @click="remove_module(i)"></v-btn>
+                <v-badge :model-value="module_up(i) > 0" :content="module_up(i)">
+                  <v-btn density="compact" color="info" icon="mdi-arrow-up-thick" variant="text"></v-btn>
+                </v-badge>
+                <v-badge :model-value="module_down(i) > 0" :content="module_down(i)">
+                  <v-btn density="compact" color="info" icon="mdi-arrow-down-thick" variant="text"></v-btn>
+                </v-badge>
+                <v-btn density="compact" color="info" icon="mdi-sync" variant="text" @click="sync_module(i)"></v-btn>
+                <v-btn density="compact" color="info" icon="mdi-pen" variant="text" @click="edit_module_confirm(i)"></v-btn>
+                <v-btn density="compact" color="error" icon="mdi-delete" variant="text" @click="remove_module(i)"></v-btn>
               </template>
             </v-list-item>
           </v-list>
         </v-col>
         <v-col cols="6">
-          <v-btn class="w-100 my-1" color="info" @click="fetch_all">Fetch All</v-btn>
-          <v-btn class="w-100 my-1" color="info" @click="sync_all">Sync All</v-btn>
+          <v-btn class="w-100 my-1" color="info" @click="fetch_all">全部狀態更新</v-btn>
+          <v-btn class="w-100 my-1" color="info" @click="sync_all">全部資源同步</v-btn>
         </v-col>
       </v-row>
       <v-card flat class="w-100">
         <v-card-title>純檔案區</v-card-title>
         <v-card-subtitle>非模組化, 簡單的檔案備份與同步管理</v-card-subtitle>
       </v-card>
+      <v-card flat class="w-100 d-flex pa-3">
+        <v-btn class="flex-fill" flat @click="create_res" :disabled="!is_project_load" color="primary">新增檔案同步</v-btn>
+      </v-card>
+      <v-row class="pa-1 ma-1" style="height: 25vh;">
+        <v-col cols="6">
+          <v-list style="height: 25vh;">
+            <v-list-item class="text-truncate" v-for="(ms, i) in resources" :key="i">
+              <v-list-item-title style="cursor: pointer" @click="open(ms.to)">本地: {{ ms.to }}</v-list-item-title>
+              <v-list-item-subtitle style="cursor: pointer" @click="open(ms.from)">來源: {{ ms.from }}</v-list-item-subtitle>
+              <template v-slot:append>
+                <v-btn density="compact" color="info" icon="mdi-arrow-up-thick" variant="text"></v-btn>
+                <v-btn density="compact" color="info" icon="mdi-arrow-down-thick" variant="text"></v-btn>
+              </template>
+            </v-list-item>
+          </v-list>
+        </v-col>
+        <v-col cols="6">
+          <v-btn class="w-100 my-1" color="info" @click="fetch_all">全部資源備份</v-btn>
+          <v-btn class="w-100 my-1" color="info" @click="sync_all">全部資源下載</v-btn>
+        </v-col>
+      </v-row>
+
       <v-dialog v-model="create_module" width="500">
         <v-card flat class="pa-4">
           <v-card-title>{{ create_module_title }}</v-card-title>
@@ -48,12 +78,37 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <v-dialog v-model="create_resource" width="500">
+        <v-card flat class="pa-4">
+          <v-card-title>{{ create_resource_title }}</v-card-title>
+          <v-card-text>
+            <v-text-field v-model="create_resource_content.from" label="來源"></v-text-field>
+            <v-text-field v-model="create_resource_content.to" label="專案內路徑"></v-text-field>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn @click="create_res_confirm" color="success">確認</v-btn>
+            <v-btn @click="create_resource = false" color="error">取消</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="delete_dialog" width="500">
+        <v-card flat class="pa-4">
+          <v-card-title>{{ delete_title }}</v-card-title>
+          <v-card-text>
+            {{ delete_text }}
+          </v-card-text>
+          <v-card-actions>
+            <v-btn @click="delete_confirm" color="success">確認</v-btn>
+            <v-btn @click="delete_dialog = false" color="error">取消</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-container>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { project_config, project_module, setting_file, project_resource, Snackbar_Content } from '@/backend/struct'
+import { project_config, project_module, setting_file, project_resource, Snackbar_Content, module_state } from '@/backend/struct'
 import { ipcRenderer } from 'electron'
 import * as path from 'path'
 
@@ -69,6 +124,12 @@ interface project_interface {
   create_resource_title: string
   create_resource_content: project_resource
   edit_resource: number
+  delete_dialog: boolean
+  delete_title: string
+  delete_text: string
+  delete_mode: number // ws or pro
+  delete_index: number
+  module_status: Array<module_state | undefined>
 }
 
 export default defineComponent({
@@ -78,6 +139,12 @@ export default defineComponent({
     project_path: String,
     setting: Object
   },
+  watch: {
+    project: function(newP, oldP){
+      console.log("Project Update",this.project_path);
+      this.fetch_all();
+    }
+  },
   computed:{
     is_project_load():boolean{
       return this.project !== undefined;
@@ -86,6 +153,11 @@ export default defineComponent({
       if(this.project === undefined) return [];
       const pro_input:project_config = this.project as project_config;
       return pro_input.modules;
+    },
+    resources():Array<project_resource>{
+      if(this.project === undefined) return [];
+      const pro_input:project_config = this.project as project_config;
+      return pro_input.resource;
     }
   },
   methods:{
@@ -94,6 +166,12 @@ export default defineComponent({
       this.create_module_mode = 0;
       this.create_module_title = "新增模組"
       this.create_module_content = { name: "", url: "", branch: "", use_branch: false, use_name: false, target_path: ""};
+    },
+    create_res(){
+      this.create_resource = true;
+      this.create_resource_mode = 0;
+      this.create_resource_title = "新增檔案同步"
+      this.create_resource_content = { from: "", to: "" };
     },
     create_confirm(){
       const pro_input:project_config = this.project as project_config;
@@ -108,6 +186,15 @@ export default defineComponent({
         this.create_module = false;
       }
     },
+    create_res_confirm(){
+      const pro_input:project_config = this.project as project_config;
+      const set_input:setting_file = this.setting as setting_file;
+      if(this.create_resource_mode == 0){
+        pro_input.resource.push(this.create_resource_content);
+        ipcRenderer.invoke('loader-project-save', this.project_path, JSON.stringify(pro_input), set_input.config_filename);
+        this.create_resource = false;
+      }
+    },
     sync_module(index:number){
       const pro_input:project_config = this.project as project_config;
       const target = pro_input.modules[index];
@@ -116,7 +203,17 @@ export default defineComponent({
       if(target.use_name && target.name.length > 0){
         pat = path.join(pat, target.name);
       }
-      ipcRenderer.invoke('git-sync', pat, target.url, target.use_branch, target.branch)
+      const k:Snackbar_Content = {
+          title: "更新完畢",
+          text: `更新了 ${target.target_path} 模組`,
+          color: "info",
+          has_close: true
+        }
+      ipcRenderer.invoke('git-sync', pat, target.url, target.use_branch, target.branch).then(()=> {
+        this.$emit('toast', k);
+        this.loading = false;
+      })
+      this.loading = true;
     },
     edit_module_confirm(index:number){
       const pro_input:project_config = this.project as project_config;
@@ -128,22 +225,50 @@ export default defineComponent({
     },
     remove_module(index:number){
       const pro_input:project_config = this.project as project_config;
-      const set_input:setting_file = this.setting as setting_file;
-      pro_input.modules.splice(index, 1);
-      ipcRenderer.invoke('loader-project-save', this.project_path, JSON.stringify(pro_input), set_input.config_filename);
+      this.delete_mode = 0;
+      this.delete_index = index;
+      this.delete_dialog = true;
+      this.delete_title = "刪除模組";
+      this.delete_text = `確認刪除模組 ${pro_input.modules[index].target_path} 嗎?`;
+    },
+    delete_confirm(){
+      if(this.delete_mode == 0){
+        const pro_input:project_config = this.project as project_config;
+        const set_input:setting_file = this.setting as setting_file;
+        pro_input.modules.splice(this.delete_index, 1);
+        ipcRenderer.invoke('loader-project-save', this.project_path, JSON.stringify(pro_input), set_input.config_filename);
+      }
+      this.delete_dialog = false;
     },
     fetch_all(){
       const pro_input:project_config = this.project as project_config;
       const leng = pro_input.modules.length;
-      for(let i = 0; i < leng; i++){
-        const target = pro_input.modules[i];
+      this.module_status = []
+      const tasks = pro_input.modules.map((target, i) => {
         if(this.project_path == undefined) return;
         let pat = path.join(this.project_path, target.target_path);
         if(target.use_name && target.name.length > 0){
           pat = path.join(pat, target.name);
         }
-        ipcRenderer.invoke('git-fetch', pat, target.url, target.use_branch, target.branch)
-      }
+        return ipcRenderer.invoke('git-fetch', pat, target.url, target.use_branch, target.branch).then(vs => {
+          if(vs == undefined) return;
+          const v:module_state = JSON.parse(vs);
+          this.module_status[i] = v;
+          console.log(target.url, target.target_path, v);
+        })
+      })
+
+      Promise.all(tasks).then(() => {
+        const k:Snackbar_Content = {
+          title: "更新完畢",
+          text: `更新了 ${leng} 個子模組`,
+          color: "info",
+          has_close: true
+        }
+        this.$emit('toast', k);
+        this.loading = false;
+      })
+      this.loading = true;
     },
     sync_all(){
       const pro_input:project_config = this.project as project_config;
@@ -156,7 +281,6 @@ export default defineComponent({
           pat = path.join(pat, target.name);
         }
         return ipcRenderer.invoke('git-sync', pat, target.url, target.use_branch, target.branch)
-        
       })
 
       Promise.all(tasks).then(() => {
@@ -170,6 +294,15 @@ export default defineComponent({
         this.loading = false;
       })
       this.loading = true;
+    },
+    module_up(i:number):number{
+      return this.module_status[i]?.status.not_added.length ?? 0;
+    },
+    module_down(i:number):number{
+      return (this.module_status[i]?.fetch.updated.length ?? 0) + (this.module_status[i]?.fetch.deleted.length ?? 0);
+    },
+    open(command:string){
+      ipcRenderer.invoke('shell', command);
     }
   },
   data(): project_interface{
@@ -184,7 +317,13 @@ export default defineComponent({
       create_resource_mode: 0,
       create_resource_title: "",
       create_resource_content: { from: "", to: "" },
-      edit_resource: 0
+      edit_resource: 0,
+      module_status: [],
+      delete_dialog: false,
+      delete_title: "",
+      delete_text: "",
+      delete_mode: 0,
+      delete_index: 0
     }
   }
 })

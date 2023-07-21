@@ -16,14 +16,9 @@
         </v-list>
 
         <template v-slot:append>
-          <div class="pa-2">
-            <v-btn block>
-              Logout
-            </v-btn>
-          </div>
         </template>
       </v-navigation-drawer>
-      <v-main style="height: 100vh">
+      <v-main style="height: 100vh" class="overflow-y-auto">
         <slot></slot>
       </v-main>
     </v-layout>

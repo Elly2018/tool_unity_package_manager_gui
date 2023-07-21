@@ -12,9 +12,9 @@
       <v-list v-model="select_workspace" style="height: 25vh;">
         <v-list-item v-for="(ws, i) in workspaces" :key="i" :title="ws.name" :subtitle="ws.description">
           <template v-slot:append>
-            <v-btn color="info" icon="mdi-select" variant="text" @click="select_ws(ws)"></v-btn>
-            <v-btn color="info" icon="mdi-pen" variant="text" @click="edit_ws(i)"></v-btn>
-            <v-btn color="error" icon="mdi-delete" variant="text" @click="remove_ws(i)"></v-btn>
+            <v-btn density="compact" color="info" icon="mdi-select" variant="text" @click="select_ws(ws)"></v-btn>
+            <v-btn density="compact" color="info" icon="mdi-pen" variant="text" @click="edit_ws(i)"></v-btn>
+            <v-btn density="compact" color="error" icon="mdi-delete" variant="text" @click="remove_ws(i)"></v-btn>
           </template>
         </v-list-item>
       </v-list>
@@ -28,8 +28,8 @@
       <v-list style="height: 25vh;">
         <v-list-item v-for="(pro, i) in projects" :key="i" :title="pro">
           <template v-slot:append>
-            <v-btn color="info" icon="mdi-select" variant="text" @click="select_project_confirm(pro)"></v-btn>
-            <v-btn color="error" icon="mdi-delete" variant="text" @click="remove_project(i)"></v-btn>
+            <v-btn density="compact" color="info" icon="mdi-select" variant="text" @click="select_project_confirm(pro)"></v-btn>
+            <v-btn density="compact" color="error" icon="mdi-delete" variant="text" @click="remove_project(i)"></v-btn>
           </template>
         </v-list-item>
       </v-list>

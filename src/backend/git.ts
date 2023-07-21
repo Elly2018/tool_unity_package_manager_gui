@@ -18,9 +18,12 @@ export function EventInit(){
             if(!exist) fs.mkdirSync(pat, {recursive: true});
             const git = simpleGit.gitP(pat, options)
             await git.clone(url, pat, { '--branch':  use_branch && branch.length > 0 ? branch : null}, (error) => { console.log(error) })
+            return undefined;
         }else{
             const git = simpleGit.gitP(pat);
-            await git.fetch();
+            const result_f = await git.fetch();
+            const result_s = await git.status();
+            return JSON.stringify({fetch: result_f, status: result_s});
         }
     })
     ipcMain.handle('git-sync', async (e:IpcMainInvokeEvent, pat:string, url:string, use_branch:boolean, branch:string) => {

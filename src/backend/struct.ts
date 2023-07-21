@@ -1,3 +1,5 @@
+import { FetchResult, StatusResult } from 'simple-git'
+
 export interface workspace_config {
     projects: Array<string>
     name: string
@@ -59,4 +61,9 @@ export interface Snackbar_Content{
     text: string
     color: string
     has_close: boolean
+}
+
+export interface module_state {
+    fetch: FetchResult
+    status: StatusResult
 }
