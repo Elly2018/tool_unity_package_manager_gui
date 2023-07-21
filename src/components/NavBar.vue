@@ -2,7 +2,7 @@
   <v-card>
     <v-layout>
       <v-navigation-drawer
-        class="bg-deep-purple"
+        class="surface"
         theme="dark"
         permanent
       >

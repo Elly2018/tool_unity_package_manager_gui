@@ -10,14 +10,12 @@ const DarkTheme:ThemeDefinition = {
   colors: {
     background: '#1C1C1E',
     surface: '#1C1C1E',
-    primary: '#557B833',
-    'primary-darken-1': '#2f009e',
+    primary: '#75a9b4',
     secondary: '#39AEA9',
-    'secondary-darken-1': '#096d6d',
     error: '#A53828',
-    info: '#1D5F8A',
-    success: '#116D4D',
-    warning: '#AC894C',
+    info: '#298bca',
+    success: '#1fae7c',
+    warning: '#dcb064',
   },
   variables:{
     h1: 'text-h1',

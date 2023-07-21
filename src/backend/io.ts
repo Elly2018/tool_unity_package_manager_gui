@@ -1,5 +1,6 @@
 import { IpcMainInvokeEvent, ipcMain, dialog, BrowserWindow, shell } from "electron";
 import * as fs from 'fs'
+import * as fse from 'fs-extra'
 
 export function EventInit(win:BrowserWindow){
     ipcMain.handle('shell', (e:IpcMainInvokeEvent, command:string) => {
@@ -22,5 +23,8 @@ export function EventInit(win:BrowserWindow){
         if(result != undefined && result.length > 0){
             return result[0];
         }
+    })
+    ipcMain.handle('io-copyto', async (e:IpcMainInvokeEvent, src:string, dist:string, override:boolean) => {
+        return fse.copy(src, dist, {overwrite: override});
     })
 }

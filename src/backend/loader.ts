@@ -27,7 +27,7 @@ export function EventInit(){
             const result = fs.readFileSync(p)
             return result.toString();
         }else{
-            const k:setting_file = { config_filename: "fufu.json", lastopen: "" }
+            const k:setting_file = { config_filename: "fufu.json", theme: "DarkTheme", auto_commit_format: "package manager auto commit %DATE% %TIME%" }
             const k_string = JSON.stringify(k);
             fs.writeFileSync(p, k_string);
             return k_string;
@@ -45,6 +45,11 @@ export function EventInit(){
             fs.writeFileSync(p, k_string);
             return k_string;
         }
+    })
+
+    ipcMain.handle('loader-preset-save', (e:IpcMainInvokeEvent, v:string) => {
+        const p = path.join(__dirname, 'preset.json');
+        fs.writeFileSync(p, v);
     })
 
     ipcMain.handle('loader-recent', (e:IpcMainInvokeEvent) => {

@@ -4,7 +4,7 @@
         <Homepage v-show="page == 0"/>
         <Dashboard v-show="page == 1"/>
         <Workspace v-show="page == 2" :workspace="workspace" @select="select_project"/>
-        <Project v-show="page == 3" :project="project" :project_path="project_path" :setting="setting" @toast="toast"/>
+        <Project v-show="page == 3" :preset="preset" :project="project" :project_path="project_path" :setting="setting" @toast="toast"/>
         <Preset v-show="page == 4" :preset="preset"/>
         <Setting v-show="page == 5" :setting="setting"/>
       </NavBar>

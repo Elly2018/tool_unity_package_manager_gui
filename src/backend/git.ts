@@ -26,7 +26,7 @@ export function EventInit(){
             return JSON.stringify({fetch: result_f, status: result_s});
         }
     })
-    ipcMain.handle('git-sync', async (e:IpcMainInvokeEvent, pat:string, url:string, use_branch:boolean, branch:string) => {
+    ipcMain.handle('git-sync', async (e:IpcMainInvokeEvent, pat:string, url:string, use_branch:boolean, branch:string, auto_commit:string) => {
         const exist = fs.existsSync(pat);
         const gitexist = fs.existsSync(path.join(pat, '.git'));
         if(!exist || !gitexist) {
@@ -35,8 +35,26 @@ export function EventInit(){
             await git.clone(url, pat, { '--branch': use_branch && branch.length > 0 ? branch : null}, (error) => { console.log(error) })
         }else{
             const git = simpleGit.gitP(pat);
-            if(use_branch && branch.length > 0) git.checkout(branch);
-            await git.pull();
+            const result_f = await git.fetch();
+            const result_s = await git.status();
+            const result_b = await git.branch();
+            const date:Date = new Date(Date.now());
+            const syncAction = async () => {
+                if(result_s.not_added.length > 0){
+                    await git.commit(auto_commit.replace(/(%DATE%)/, date.toDateString()).replace(/(%TIME%)/, date.toTimeString()), result_s.not_added);
+                    await git.push();
+                }
+                if(result_f.deleted.length + result_f.updated.length > 0){
+                    await git.pull();   
+                }
+            }
+            if(result_b.current != branch && use_branch){
+                await syncAction();
+                if(use_branch && branch.length > 0) git.checkout(branch);
+                await git.pull();
+            }else{
+                await syncAction();
+            }
         }
     })
 }

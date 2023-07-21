@@ -8,14 +8,14 @@
         </v-card-text>
       </v-card>
       <v-card flat class="w-100 d-flex pa-3">
-        <v-btn class="flex-fill" flat @click="create" :disabled="!is_project_load" color="primary">新增模組</v-btn>
+        <v-btn variant="tonal" class="flex-fill ma-1" flat @click="create" :disabled="!is_project_load" color="primary">新增模組</v-btn>
       </v-card>
-      <v-row class="pa-1 ma-1" style="height: 25vh;">
+      <v-row class="pa-1 ma-1" style="height: 30vh;">
         <v-col cols="6">
           <v-list style="height: 25vh;">
             <v-list-item class="text-truncate" v-for="(ms, i) in modules" :key="i">
-              <v-list-item-title style="cursor: pointer" @click="open(project_path + '\\' + ms.target_path)">本地: {{ ms.target_path }}</v-list-item-title>
-              <v-list-item-subtitle style="cursor: pointer" @click="open(ms.url)">來源: {{ ms.url + '\n' + ms.branch }}</v-list-item-subtitle>
+              <v-list-item-title style="cursor: pointer" class="text-decoration-underline" @click="open(project_path + '\\' + ms.target_path)">本地: {{ ms.target_path }}</v-list-item-title>
+              <v-list-item-subtitle style="cursor: pointer" class="text-decoration-underline" @click="open(ms.url)">來源: {{ ms.url + '\n' + ms.branch }}</v-list-item-subtitle>
               <template v-slot:append>
                 <v-badge :model-value="module_up(i) > 0" :content="module_up(i)">
                   <v-btn density="compact" color="info" icon="mdi-arrow-up-thick" variant="text"></v-btn>
@@ -31,33 +31,35 @@
           </v-list>
         </v-col>
         <v-col cols="6">
-          <v-btn class="w-100 my-1" color="info" @click="fetch_all">全部狀態更新</v-btn>
-          <v-btn class="w-100 my-1" color="info" @click="sync_all">全部資源同步</v-btn>
+          <v-btn variant="tonal" class="w-100 my-1" color="info" @click="fetch_all" :disabled="!is_project_load">全部狀態更新</v-btn>
+          <v-btn variant="tonal" class="w-100 my-1" color="info" @click="sync_all" :disabled="!is_project_load">全部資源同步</v-btn>
         </v-col>
       </v-row>
       <v-card flat class="w-100">
         <v-card-title>純檔案區</v-card-title>
-        <v-card-subtitle>非模組化, 簡單的檔案備份與同步管理</v-card-subtitle>
+        <v-card-subtitle>非模組化, 簡單的檔案備份與同步管理, 這邊只會用複製的功能, 刪除的檔案不會同步刪除 (注意)</v-card-subtitle>
       </v-card>
       <v-card flat class="w-100 d-flex pa-3">
-        <v-btn class="flex-fill" flat @click="create_res" :disabled="!is_project_load" color="primary">新增檔案同步</v-btn>
+        <v-btn variant="tonal" class="flex-fill ma-1" flat @click="create_res" :disabled="!is_project_load" color="primary">新增檔案同步</v-btn>
       </v-card>
-      <v-row class="pa-1 ma-1" style="height: 25vh;">
+      <v-row class="pa-1 ma-1" style="height: 30vh;">
         <v-col cols="6">
           <v-list style="height: 25vh;">
-            <v-list-item class="text-truncate" v-for="(ms, i) in resources" :key="i">
-              <v-list-item-title style="cursor: pointer" @click="open(ms.to)">本地: {{ ms.to }}</v-list-item-title>
-              <v-list-item-subtitle style="cursor: pointer" @click="open(ms.from)">來源: {{ ms.from }}</v-list-item-subtitle>
+            <v-list-item shaped="true" class="text-truncate" v-for="(ms, i) in resources" :key="i">
+              <v-list-item-title class="text-decoration-underline" style="cursor: pointer" @click="open(ms.to)">本地: {{ ms.to }}</v-list-item-title>
+              <v-list-item-subtitle class="text-decoration-underline" style="cursor: pointer" @click="open(ms.from)">來源: {{ ms.from }}</v-list-item-subtitle>
               <template v-slot:append>
                 <v-btn density="compact" color="info" icon="mdi-arrow-up-thick" variant="text"></v-btn>
                 <v-btn density="compact" color="info" icon="mdi-arrow-down-thick" variant="text"></v-btn>
+                <v-btn density="compact" color="info" icon="mdi-pen" variant="text" @click="edit_resource_confirm(i)"></v-btn>
+                <v-btn density="compact" color="error" icon="mdi-delete" variant="text" @click="remove_resource(i)"></v-btn>
               </template>
             </v-list-item>
           </v-list>
         </v-col>
         <v-col cols="6">
-          <v-btn class="w-100 my-1" color="info" @click="fetch_all">全部資源備份</v-btn>
-          <v-btn class="w-100 my-1" color="info" @click="sync_all">全部資源下載</v-btn>
+          <v-btn variant="tonal" class="w-100 my-1" color="info" @click="backup_all" :disabled="!is_project_load">全部資源備份</v-btn>
+          <v-btn variant="tonal" class="w-100 my-1" color="info" @click="resource_download_all" :disabled="!is_project_load">全部資源下載</v-btn>
         </v-col>
       </v-row>
 
@@ -73,8 +75,8 @@
             <v-text-field v-model="create_module_content.target_path" label="路徑"></v-text-field>
           </v-card-text>
           <v-card-actions>
-            <v-btn @click="create_confirm" color="success">確認</v-btn>
-            <v-btn @click="create_module = false" color="error">取消</v-btn>
+            <v-btn variant="tonal" @click="create_confirm" color="success">確認</v-btn>
+            <v-btn variant="tonal" @click="create_module = false" color="error">取消</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -86,8 +88,8 @@
             <v-text-field v-model="create_resource_content.to" label="專案內路徑"></v-text-field>
           </v-card-text>
           <v-card-actions>
-            <v-btn @click="create_res_confirm" color="success">確認</v-btn>
-            <v-btn @click="create_resource = false" color="error">取消</v-btn>
+            <v-btn variant="tonal" @click="create_res_confirm" color="success">確認</v-btn>
+            <v-btn variant="tonal" @click="create_resource = false" color="error">取消</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -98,8 +100,8 @@
             {{ delete_text }}
           </v-card-text>
           <v-card-actions>
-            <v-btn @click="delete_confirm" color="success">確認</v-btn>
-            <v-btn @click="delete_dialog = false" color="error">取消</v-btn>
+            <v-btn variant="tonal" @click="delete_confirm" color="success">確認</v-btn>
+            <v-btn variant="tonal" @click="delete_dialog = false" color="error">取消</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -127,7 +129,7 @@ interface project_interface {
   delete_dialog: boolean
   delete_title: string
   delete_text: string
-  delete_mode: number // ws or pro
+  delete_mode: number // git or res
   delete_index: number
   module_status: Array<module_state | undefined>
 }
@@ -136,6 +138,7 @@ export default defineComponent({
   name: 'VProject',
   props: {
     project: Object,
+    preset: Object,
     project_path: String,
     setting: Object
   },
@@ -231,11 +234,33 @@ export default defineComponent({
       this.delete_title = "刪除模組";
       this.delete_text = `確認刪除模組 ${pro_input.modules[index].target_path} 嗎?`;
     },
+    edit_resource_confirm(index:number){
+      const pro_input:project_config = this.project as project_config;
+      this.create_resource = true;
+      this.create_resource_mode = 1;
+      this.create_resource_title = "編輯資源同步"
+      this.edit_resource = index;
+      this.create_resource_content = pro_input.resource[index];
+    },
+    remove_resource(index:number){
+      const pro_input:project_config = this.project as project_config;
+      this.delete_mode = 1;
+      this.delete_index = index;
+      this.delete_dialog = true;
+      this.delete_title = "刪除資源同步";
+      this.delete_text = `確認刪除資源同步 ${pro_input.resource[index].to} 嗎?`;
+    },
     delete_confirm(){
       if(this.delete_mode == 0){
         const pro_input:project_config = this.project as project_config;
         const set_input:setting_file = this.setting as setting_file;
         pro_input.modules.splice(this.delete_index, 1);
+        ipcRenderer.invoke('loader-project-save', this.project_path, JSON.stringify(pro_input), set_input.config_filename);
+      }
+      else if(this.delete_mode == 1){
+        const pro_input:project_config = this.project as project_config;
+        const set_input:setting_file = this.setting as setting_file;
+        pro_input.resource.splice(this.delete_index, 1);
         ipcRenderer.invoke('loader-project-save', this.project_path, JSON.stringify(pro_input), set_input.config_filename);
       }
       this.delete_dialog = false;
@@ -287,6 +312,44 @@ export default defineComponent({
         const k:Snackbar_Content = {
           title: "同步完畢",
           text: `同步了 ${leng} 個子模組`,
+          color: "info",
+          has_close: true
+        }
+        this.$emit('toast', k);
+        this.loading = false;
+      })
+      this.loading = true;
+    },
+    backup_all(){
+      const pro_input:project_config = this.project as project_config;
+      const leng = pro_input.resource.length;
+      const tasks = pro_input.resource.map(target => {
+        return ipcRenderer.invoke('io-copyto', target.to, target.from, true);
+      })
+
+      Promise.all(tasks).then(() => {
+        const k:Snackbar_Content = {
+          title: "資源備份完畢",
+          text: `備份了 ${leng} 個資源配置`,
+          color: "info",
+          has_close: true
+        }
+        this.$emit('toast', k);
+        this.loading = false;
+      })
+      this.loading = true;
+    },
+    resource_download_all(){
+      const pro_input:project_config = this.project as project_config;
+      const leng = pro_input.resource.length;
+      const tasks = pro_input.resource.map(target => {
+        return ipcRenderer.invoke('io-copyto', target.from, target.to, true);
+      })
+
+      Promise.all(tasks).then(() => {
+        const k:Snackbar_Content = {
+          title: "資源下載完畢",
+          text: `下載了 ${leng} 個資源配置`,
           color: "info",
           has_close: true
         }

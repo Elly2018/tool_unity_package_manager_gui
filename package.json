@@ -15,6 +15,7 @@
   "main": "background.js",
   "dependencies": {
     "@mdi/font": "5.9.55",
+    "fs-extra": "^11.1.1",
     "node-polyfill-webpack-plugin": "^2.0.1",
     "roboto-fontface": "*",
     "simple-git": "^3.19.1",
@@ -25,6 +26,7 @@
   },
   "devDependencies": {
     "@types/electron-devtools-installer": "^2.2.0",
+    "@types/fs-extra": "^11.0.1",
     "@types/jest": "^27.0.1",
     "@types/webfontloader": "^1.0.0",
     "@typescript-eslint/eslint-plugin": "^5.4.0",

@@ -15,6 +15,7 @@ export interface recent_open {
 }
 
 export interface preset_repo {
+    title: string
     url: string
     use_branch: boolean
     branch: string
@@ -23,7 +24,7 @@ export interface preset_repo {
 }
 
 export interface preset_path {
-    name: string
+    title: string
     path: string
 }
 
@@ -53,7 +54,8 @@ export interface project_config {
 
 export interface setting_file {
     config_filename: string
-    lastopen: string
+    theme: string
+    auto_commit_format: string
 }
 
 export interface Snackbar_Content{
