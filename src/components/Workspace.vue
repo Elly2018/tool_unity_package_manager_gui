@@ -171,6 +171,7 @@ export default defineComponent({
     },
     addproject(){
       ipcRenderer.invoke('io-open-folder', "新增專案路徑").then((v:string) => {
+        if(v == undefined) return;
         const ws_input:workspace_file = this.workspace as workspace_file;
         this.select_workspace?.projects.push(v);
         ipcRenderer.invoke('loader-workspace-save', JSON.stringify(ws_input));

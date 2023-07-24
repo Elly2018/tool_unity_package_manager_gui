@@ -8,7 +8,9 @@
       >
         <v-list color="transparent">
           <v-list-item prepend-icon="mdi-home" title="首頁" @click="Page(0)" :disabled="page == 0"></v-list-item>
-          <v-list-item prepend-icon="mdi-view-dashboard" title="預覽" @click="Page(1)" :disabled="page == 1"></v-list-item>
+          <!---
+            <v-list-item prepend-icon="mdi-view-dashboard" title="預覽" @click="Page(1)" :disabled="page == 1"></v-list-item>
+          -->
           <v-list-item prepend-icon="mdi-view-carousel" title="工作區" @click="Page(2)" :disabled="page == 2"></v-list-item>
           <v-list-item prepend-icon="mdi-code-tags" title="專案" @click="Page(3)" :disabled="page == 3"></v-list-item>
           <v-list-item prepend-icon="mdi-note" title="預定義" @click="Page(4)" :disabled="page == 4"></v-list-item>

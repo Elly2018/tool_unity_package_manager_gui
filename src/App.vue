@@ -81,8 +81,9 @@ export default defineComponent({
       })
     },
     toast(v:Snackbar_Content){
-      this.Snackbar = true;
-      this.Snackbar_data = v;
+      //this.Snackbar = true;
+      //this.Snackbar_data = v;
+      ipcRenderer.invoke('notification', v.title, v.text);
     }
   },
   data() : app_interface{

@@ -6,6 +6,7 @@ import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import * as loader from './backend/loader'
 import * as io from './backend/io'
 import * as git from './backend/git'
+import * as noti from './backend/notification'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -28,14 +29,24 @@ async function createWindow() {
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: (process.env
           .ELECTRON_NODE_INTEGRATION as unknown) as boolean,
+      nodeIntegrationInSubFrames: (process.env
+        .ELECTRON_NODE_INTEGRATION as unknown) as boolean,
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION
     }
+  })
+
+  win.on('blur', (event:Electron.Event) => {
+    win.webContents.send('blur');
+  })
+  win.on('focus', (event:Electron.Event) => {
+    win.webContents.send('focus');
   })
 
   win.setMenu(null);
   loader.EventInit();
   io.EventInit(win);
   git.EventInit();
+  noti.EventInit();
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
