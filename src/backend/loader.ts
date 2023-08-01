@@ -5,7 +5,7 @@ import * as path from 'path'
 
 export function EventInit(){
     ipcMain.handle('loader-workspace', (e:IpcMainInvokeEvent) => {
-        const p = path.join(__dirname, 'workspace.json');
+        const p = path.join('workspace.json');
         if(fs.existsSync(p)){
             const result = fs.readFileSync(p)
             return result.toString();
@@ -17,12 +17,12 @@ export function EventInit(){
         }
     })
     ipcMain.handle('loader-workspace-save', (e:IpcMainInvokeEvent, v:string) => {
-        const p = path.join(__dirname, 'workspace.json');
+        const p = path.join('workspace.json');
         fs.writeFileSync(p, v);
     })
 
     ipcMain.handle('loader-setting', (e:IpcMainInvokeEvent) => {
-        const p = path.join(__dirname, 'setting.json');
+        const p = path.join('setting.json');
         if(fs.existsSync(p)){
             const result = fs.readFileSync(p)
             return result.toString();
@@ -35,7 +35,7 @@ export function EventInit(){
     })
 
     ipcMain.handle('loader-preset', (e:IpcMainInvokeEvent) => {
-        const p = path.join(__dirname, 'preset.json');
+        const p = path.join('preset.json');
         if(fs.existsSync(p)){
             const result = fs.readFileSync(p)
             return result.toString();
@@ -48,12 +48,12 @@ export function EventInit(){
     })
 
     ipcMain.handle('loader-preset-save', (e:IpcMainInvokeEvent, v:string) => {
-        const p = path.join(__dirname, 'preset.json');
+        const p = path.join('preset.json');
         fs.writeFileSync(p, v);
     })
 
     ipcMain.handle('loader-recent', (e:IpcMainInvokeEvent) => {
-        const p = path.join(__dirname, 'recent.json');
+        const p = path.join('recent.json');
         if(fs.existsSync(p)){
             const result = fs.readFileSync(p)
             return result.toString();

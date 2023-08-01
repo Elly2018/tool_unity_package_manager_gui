@@ -40,8 +40,13 @@ export function EventInit(){
             const result_b = await git.branch();
             const date:Date = new Date(Date.now());
             const syncAction = async () => {
-                if(result_s.not_added.length > 0){
-                    await git.commit(auto_commit.replace(/(%DATE%)/, date.toDateString()).replace(/(%TIME%)/, date.toTimeString()), result_s.not_added);
+                if((result_s.not_added.length + result_s.deleted.length + result_s.modified.length) > 0){
+                    let all:Array<string> = []
+                    all.push(...result_s.not_added);
+                    all.push(...result_s.modified);
+                    all.push(...result_s.deleted);
+                    await git.add(all)
+                    await git.commit(auto_commit.replace(/(%DATE%)/, date.toDateString()).replace(/(%TIME%)/, date.toTimeString()), all);
                     await git.push();
                 }
                 if(result_f.deleted.length + result_f.updated.length > 0){

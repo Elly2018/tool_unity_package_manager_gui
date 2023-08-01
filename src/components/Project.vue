@@ -248,6 +248,7 @@ export default defineComponent({
     },
     sync_module(index:number){
       const pro_input:project_config = this.project as project_config;
+      const set_input:setting_file = this.setting as setting_file;
       const target = pro_input.modules[index];
       if(this.project_path == undefined) return;
       let pat = path.join(this.project_path, target.target_path);
@@ -260,7 +261,7 @@ export default defineComponent({
           color: "info",
           has_close: true
         }
-      ipcRenderer.invoke('git-sync', pat, target.url, target.use_branch, target.branch).then(()=> {
+      ipcRenderer.invoke('git-sync', pat, target.url, target.use_branch, target.branch, set_input.auto_commit_format).then(()=> {
         this.$emit('toast', k);
         this.loading = false;
       })
@@ -355,6 +356,7 @@ export default defineComponent({
     },
     sync_all(){
       const pro_input:project_config = this.project as project_config;
+      const set_input:setting_file = this.setting as setting_file;
       const leng = pro_input.modules.length;
 
       const tasks = pro_input.modules.map(target => {
@@ -363,7 +365,7 @@ export default defineComponent({
         if(target.use_name && target.name.length > 0){
           pat = path.join(pat, target.name);
         }
-        return ipcRenderer.invoke('git-sync', pat, target.url, target.use_branch, target.branch)
+        return ipcRenderer.invoke('git-sync', pat, target.url, target.use_branch, target.branch, set_input.auto_commit_format)
       })
 
       Promise.all(tasks).then(() => {
@@ -417,7 +419,7 @@ export default defineComponent({
       this.loading = true;
     },
     module_up(i:number):number{
-      return this.module_status[i]?.status.not_added.length ?? 0;
+      return (this.module_status[i]?.status.not_added.length ?? 0) + (this.module_status[i]?.status.modified.length ?? 0) + (this.module_status[i]?.status.deleted.length ?? 0);
     },
     module_down(i:number):number{
       return (this.module_status[i]?.fetch.updated.length ?? 0) + (this.module_status[i]?.fetch.deleted.length ?? 0);
