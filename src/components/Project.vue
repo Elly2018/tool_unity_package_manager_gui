@@ -19,8 +19,14 @@
                 <v-col cols="6">
                   <v-list style="height: 25vh;">
                     <v-list-item class="text-truncate" v-for="(ms, i) in modules" :key="i">
-                      <v-list-item-title style="cursor: pointer" class="text-decoration-underline" @click="open(project_path + '\\' + ms.target_path)">本地: {{ ms.target_path }}</v-list-item-title>
-                      <v-list-item-subtitle style="cursor: pointer" class="text-decoration-underline" @click="open(ms.url)">來源: {{ ms.url + '\n' + ms.branch }}</v-list-item-subtitle>
+                      <v-list-item-title style="cursor: pointer" class="text-decoration-underline" @click="open(project_path + '\\' + ms.target_path + '\\' + ms.name)">本地: {{ ms.target_path + '/' + ms.name }}</v-list-item-title>
+                      <v-list-item-subtitle>
+                        <span>分支: {{ ms.branch }}, </span>
+                        <span style="cursor: pointer" class="text-decoration-underline" @click="open(ms.url)">來源: {{ ms.url }} </span>
+                      </v-list-item-subtitle>
+                      <template v-slot:prepend>
+                        <v-btn density="compact" color="info" icon="mdi-select" variant="text" @click="select_module(i)"></v-btn>
+                      </template>
                       <template v-slot:append>
                         <v-badge :model-value="module_up(i) > 0" :content="module_up(i)">
                           <v-btn density="compact" color="info" icon="mdi-arrow-up-thick" variant="text"></v-btn>
@@ -76,6 +82,26 @@
 
       <v-card flat class="w-100">
         <v-card-subtitle>模組動作</v-card-subtitle>
+        <v-card-text>
+          <v-card flat class="w-100 d-flex pa-3">
+            <v-btn variant="tonal" class="flex-fill ma-1" flat @click="create" :disabled="!is_project_load" color="primary">狀態更新</v-btn>
+            <v-btn variant="tonal" class="flex-fill ma-1" flat @click="create" :disabled="!is_project_load" color="warning">新增分支</v-btn>
+            <v-btn variant="tonal" class="flex-fill ma-1" flat @click="create" :disabled="!is_project_load" color="warning">切換分支</v-btn>
+            <v-btn variant="tonal" class="flex-fill ma-1" flat @click="create" :disabled="!is_project_load" color="secondary">拉下</v-btn>
+            <v-btn variant="tonal" class="flex-fill ma-1" flat @click="create" :disabled="!is_project_load" color="secondary">推上</v-btn>
+            <v-btn variant="tonal" class="flex-fill ma-1" flat @click="create" :disabled="!is_project_load" color="primary">紀錄</v-btn>
+            <v-btn variant="tonal" class="flex-fill ma-1" flat @click="create" :disabled="!is_project_load" color="error">合併</v-btn>
+            
+          </v-card>
+          <v-row>
+            <v-col cols="6">
+              Hello
+            </v-col>
+            <v-col cols="6">
+              World
+            </v-col>
+          </v-row>
+        </v-card-text>
       </v-card>
 
       <v-dialog v-model="create_module" width="500">
@@ -275,6 +301,11 @@ export default defineComponent({
       this.edit_module = index;
       this.create_module_content = pro_input.modules[index];
     },
+    select_module(index:number){
+      const pro_input:project_config = this.project as project_config;
+      const target = pro_input.modules[index];
+      console.log("select", target);
+    },
     remove_module(index:number){
       const pro_input:project_config = this.project as project_config;
       this.delete_mode = 0;
@@ -377,6 +408,9 @@ export default defineComponent({
         }
         this.$emit('toast', k);
         this.loading = false;
+        for(let m = 0; m < this.module_status.length; m++){
+          this.module_status[m] = undefined;
+        }
       })
       this.loading = true;
     },

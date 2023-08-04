@@ -78,6 +78,14 @@ export function EventInit(){
         }
     })
 
+    ipcMain.handle('loader-project-reset', (e:IpcMainInvokeEvent, projectpath:string, filename:string) => {
+        const p = path.join(projectpath, filename);
+        const k:project_config = { modules: [], resource: [] }
+        const k_string = JSON.stringify(k);
+        fs.writeFileSync(p, k_string);
+        return k_string;
+    })
+
     ipcMain.handle('loader-project-save', (e:IpcMainInvokeEvent, projectpath:string, v:string, filename:string) => {
         const p = path.join(projectpath, filename);
         fs.writeFileSync(p, v);

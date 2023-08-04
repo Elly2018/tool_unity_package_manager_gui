@@ -12,12 +12,7 @@ const options: Partial<simpleGit.SimpleGitOptions> = {
 
 export function EventInit(){
     ipcMain.handle('git-fetch', async (e:IpcMainInvokeEvent, pat:string, url:string, use_branch:boolean, branch:string) => {
-        const exist = fs.existsSync(pat);
-        const gitexist = fs.existsSync(path.join(pat, '.git'));
-        if(!exist || !gitexist) {
-            if(!exist) fs.mkdirSync(pat, {recursive: true});
-            const git = simpleGit.gitP(pat, options)
-            await git.clone(url, pat, { '--branch':  use_branch && branch.length > 0 ? branch : null}, (error) => { console.log(error) })
+        if(await ExistChecker(pat, url, use_branch, branch)) {
             return undefined;
         }else{
             const git = simpleGit.gitP(pat);
@@ -27,12 +22,8 @@ export function EventInit(){
         }
     })
     ipcMain.handle('git-sync', async (e:IpcMainInvokeEvent, pat:string, url:string, use_branch:boolean, branch:string, auto_commit:string) => {
-        const exist = fs.existsSync(pat);
-        const gitexist = fs.existsSync(path.join(pat, '.git'));
-        if(!exist || !gitexist) {
-            if(!exist) fs.mkdirSync(pat, {recursive: true});
-            const git = simpleGit.gitP(pat, options);
-            await git.clone(url, pat, { '--branch': use_branch && branch.length > 0 ? branch : null}, (error) => { console.log(error) })
+        if(await ExistChecker(pat, url, use_branch, branch)) {
+            return undefined;
         }else{
             const git = simpleGit.gitP(pat);
             const result_f = await git.fetch();
@@ -62,4 +53,84 @@ export function EventInit(){
             }
         }
     })
+    ipcMain.handle('git-pull', async (e:IpcMainInvokeEvent, pat:string, url:string, use_branch:boolean, branch:string) => {
+        if(await ExistChecker(pat, url, use_branch, branch)) {
+            return undefined;
+        }else{
+            const git = simpleGit.gitP(pat);
+            return await git.pull();
+        }
+    })
+    ipcMain.handle('git-push', async (e:IpcMainInvokeEvent, pat:string, url:string, use_branch:boolean, branch:string) => {
+        if(await ExistChecker(pat, url, use_branch, branch)) {
+            return undefined;
+        }else{
+            const git = simpleGit.gitP(pat);
+            return await git.push();
+        }
+    })
+    ipcMain.handle('git-commit', async (e:IpcMainInvokeEvent, pat:string, url:string, use_branch:boolean, branch:string, files:Array<string>, message: string) => {
+        if(await ExistChecker(pat, url, use_branch, branch)) {
+            return undefined;
+        }else{
+            const git = simpleGit.gitP(pat);
+            await git.add(files);
+            const c = await git.commit(message);
+            return c;
+        }
+    })
+    ipcMain.handle('git-diff', async (e:IpcMainInvokeEvent, pat:string, url:string, use_branch:boolean, branch:string) => {
+        if(await ExistChecker(pat, url, use_branch, branch)) {
+            return undefined;
+        }else{
+            const git = simpleGit.gitP(pat);
+            const d = await git.diff();
+            return d;
+        }
+    })
+    ipcMain.handle('git-checkout', async (e:IpcMainInvokeEvent, pat:string, url:string, use_branch:boolean, branch:string, to_branch:string) => {
+        if(await ExistChecker(pat, url, use_branch, branch)) {
+            return undefined;
+        }else{
+            const git = simpleGit.gitP(pat);
+            return await git.checkout(to_branch);
+        }
+    })
+    // mode: 0 only create
+    // mode: 1 create and switch (bring changes)
+    ipcMain.handle('git-branch-new', async (e:IpcMainInvokeEvent, pat:string, url:string, use_branch:boolean, branch:string, branchname: string, mode:number) => {
+        if(await ExistChecker(pat, url, use_branch, branch)) {
+            return undefined;
+        }else{
+            const git = simpleGit.gitP(pat);
+            if(mode == 0){
+                await git.branch({branchname});
+            }
+            else if(mode == 1){
+                await git.stash();
+                await git.checkoutLocalBranch(branchname)
+                await git.stash(['apply']);
+            }
+        }
+    })
+    ipcMain.handle('git-list', async (e:IpcMainInvokeEvent, pat:string, url:string, use_branch:boolean, branch:string) => {
+        if(await ExistChecker(pat, url, use_branch, branch)) {
+            return undefined;
+        }else{
+            const git = simpleGit.gitP(pat);
+            const li = await git.branchLocal();
+            return li;
+        }
+    })
+}
+
+async function ExistChecker(pat:string, url:string, use_branch:boolean, branch:string):Promise<boolean>{
+    const exist = fs.existsSync(pat);
+    const gitexist = fs.existsSync(path.join(pat, '.git'));
+    if(!exist || !gitexist){
+        if(!exist) fs.mkdirSync(pat, {recursive: true});
+        const git = simpleGit.gitP(pat, options)
+        await git.clone(url, pat, { '--branch':  use_branch && branch.length > 0 ? branch : null}, (error) => { console.log(error) })
+    }
+    return !exist || !gitexist;
 }

@@ -14,6 +14,18 @@
           <v-card-text>{{ Snackbar_data.text }}</v-card-text>
         </v-card>
       </v-snackbar>
+      <v-dialog v-model="reset_dialog" width="500">
+        <v-card flat class="pa-4">
+          <v-card-title>Parse Error</v-card-title>
+          <v-card-text>
+            Project Config Parse Error: {{ project_path_temp }}
+          </v-card-text>
+          <v-card-actions>
+            <v-btn variant="tonal" @click="reset_confirm" color="success">確認</v-btn>
+            <v-btn variant="tonal" @click="reset_dialog = false" color="error">取消</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
   </v-app>
 </template>
 
@@ -33,6 +45,7 @@ import { ipcRenderer } from 'electron'
 interface app_interface{
   page: number
   project_path: string
+  project_path_temp: string
   Snackbar: boolean
   Snackbar_data: Snackbar_Content
   workspace: workspace_file | undefined
@@ -40,6 +53,7 @@ interface app_interface{
   preset: preset_file | undefined
   setting: setting_file | undefined
   project: project_config | undefined
+  reset_dialog: boolean
 }
 
 export default defineComponent({
@@ -74,9 +88,24 @@ export default defineComponent({
   methods:{
     select_project(p:string){
       ipcRenderer.invoke('loader-project', p, this.setting?.config_filename).then((v:string) => {
+        try{
+          this.project = JSON.parse(v);
+          this.project_path = p;
+          console.log("project", this.project);
+          this.page = 3;
+        }catch(e){
+          console.error("project", e);
+          this.project_path_temp = p;
+          this.reset_dialog = true;
+        }
+      })
+    },
+    reset_confirm(){
+      this.reset_dialog = false;
+      ipcRenderer.invoke('loader-project-reset', this.project_path_temp, this.setting?.config_filename, (v:string) => {
         this.project = JSON.parse(v);
-        this.project_path = p;
-        console.log("project", this.project);
+        this.project_path = this.project_path_temp;
+        console.log("project-reset", this.project);
         this.page = 3;
       })
     },
@@ -92,11 +121,13 @@ export default defineComponent({
       Snackbar: false,
       Snackbar_data: { title: "EE", text: "EE", color: "primary", has_close: false },
       project_path: "",
+      project_path_temp: "",
       workspace: undefined,
       recent: undefined,
       preset: undefined,
       setting: undefined,
-      project: undefined
+      project: undefined,
+      reset_dialog: false
     }
   }
 })
